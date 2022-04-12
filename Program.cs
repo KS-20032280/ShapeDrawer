@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SplashKitSDK;
 
 namespace ShapeDrawer
@@ -8,25 +9,43 @@ namespace ShapeDrawer
         public static void Main()
         {
             new Window("Shape Drawer", 800, 600);
-            Shape myShape = new Shape();
+            Drawing drawing = new Drawing();
             do
             {
                 SplashKit.ProcessEvents();
-                //set reactangle to be drawn at position where mouse is clicked
+                //draw a shape at the posistion where the mouse is clicked
                 if (SplashKit.MouseClicked(MouseButton.LeftButton))
                 {
-                    myShape.X = SplashKit.MouseX();
-                    myShape.Y = SplashKit.MouseY();
+                    Shape newShape = new Shape();
+                    newShape.X = SplashKit.MouseX();
+                    newShape.Y = SplashKit.MouseY();
+                    drawing.AddShape(newShape);
                 }
 
-                //change reactangle color to random when spacebar is pressed and mouse is on rectangle
-                if (SplashKit.KeyTyped(KeyCode.SpaceKey) && myShape.IsAt(SplashKit.MousePosition()))
+                //change background color of drawing object on space pressed
+                if (SplashKit.KeyTyped(KeyCode.SpaceKey))
                 {
-                    myShape.Color = SplashKit.RandomRGBColor(255);
+                    drawing.Background = SplashKit.RandomRGBColor(255);
+                }
+
+                //select shape on right click
+                if(SplashKit.MouseClicked(MouseButton.RightButton))
+                {
+                    drawing.SelectShapesAt(SplashKit.MousePosition());
+                }
+
+                //delete selected shape
+                if(SplashKit.KeyTyped(KeyCode.DeleteKey) || SplashKit.KeyTyped(KeyCode.BackspaceKey))
+                {
+                    List<Shape> selectedShape = drawing.SelectedShapes;
+                    foreach(Shape shape in selectedShape)
+                    {
+                        drawing.RemoveShape(shape);
+                    }
                 }
 
                 SplashKit.ClearScreen();
-                myShape.Draw();
+                drawing.Draw();
                 SplashKit.RefreshScreen();
             } while (!SplashKit.WindowCloseRequested("Shape Drawer"));
         }
